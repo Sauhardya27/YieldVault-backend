@@ -1,3 +1,4 @@
 {
-  "HelloModule#Hello": "0x04FC0438280A2577668dDA6bfF7E7BD9D98119F2"
+  "MigrationModule#Migrations": "0x84Ba45eeA6C66a2dF2B6D786cc3AB9985C442059",
+  "TetherModule#Tether": "0xe0765F0c932509Fbc14648c192d44Dfef953D585"
 }
