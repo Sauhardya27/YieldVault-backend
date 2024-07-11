@@ -23,24 +23,8 @@ describe('DecentralBank', () => {
 		await rwd.transfer(decentralBank.getAddress(), tokens('1000000'));
 
 		//Distribute 100 mock Tether tokens to customer
-		await tether.connect(owner).transfer(customerAddress, tokens('100')); 
-
-		//return {tether};
+		await tether.connect(owner).transfer(customerAddress, tokens('100'));
 	});
-
-	/*before(async () => {
-	  [owner, customer] = await ethers.getSigners();
-  
-	  // Get contract instances
-	  rwd = await ethers.getContractAt('RWD', RWD.address);
-	  tether = await ethers.getContractAt('Tether', Tether.address);
-	  decentralBank = await ethers.getContractAt('DecentralBank', DecentralBank.address);
-	});*/
-
-	/*async function deployContract() { 
-		const tether = await hre.ethers.deployContract("Tether");
-		return {tether};
-	}*/
 
 	it('matches name successfully', async () => {
 		const name = await tether.name();
@@ -84,6 +68,28 @@ describe('DecentralBank', () => {
 		//isStaking Update
 		result = await decentralBank.isStaking(customerAddress);
 		expect(result).to.be.true;
+
+		//Issue tokens
+		await decentralBank.connect(owner).issueTokens();
+
+		//Ensure only the owner can issue tokens
+		await expect(decentralBank.connect(customer).issueTokens()).to.be.reverted;
+
+		//unstake tokens
+		await decentralBank.connect(customer).unstakeTokens();
+
+		//Check unstaking balances
+		result = await tether.balanceOf(customerAddress);
+		expect(result).to.equal(tokens('100')); //customer mock wallet balance after unstaking
+
+		//Check updated balance of Decentral Bank
+		result = await tether.balanceOf(decentralBank.getAddress());
+		expect(result).to.equal(tokens('0')); //decentral bank mock wallet balance after staking 100 tokens
+
+		//isStaking Update
+		result = await decentralBank.isStaking(customerAddress);
+		expect(result).to.be.false;
+
 	})
 
 });
